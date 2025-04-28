@@ -31,14 +31,13 @@ def process_large_sql_file(
                     continue
                 yield filtered_line
 
+
 # Define a filter callback to match content inside parentheses
 def keep_records(line, up_to=3):
     import re
 
-    prefix = " ".join(re.findall(r'^[^(]*', line))
-    suffix = " ".join(re.findall(r'(?<=\))[^)]*$', line))
+    prefix = " ".join(re.findall(r"^[^(]*", line))
+    suffix = " ".join(re.findall(r"(?<=\))[^)]*$", line))
 
     matches = re.findall(r"\(.*?\)", line)
-    print('0----', suffix, '----')
-    # print('----', prefix, suffix, matches, '----')
     return f"{prefix}{", ".join(matches[:up_to]) if matches else ""}{suffix}"

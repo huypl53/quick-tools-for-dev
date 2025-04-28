@@ -30,21 +30,21 @@ def trim(record_num, file_in, file_out):
     """
     from sql.trim_record import process_large_sql_file, keep_records
     import os
+
     if os.path.exists(file_out):
         logging.warning(f"File {file_out} already exists. Overwriting.")
     logging.info(f"Trimming SQL command from {file_in} to {file_out}")
 
-    # Add your trimming logic here
-    results = "".join(
-        list(
-            process_large_sql_file(
-                file_in, kept_pattern=r"^(?!insert).*", filter_callback=keep_records
-            )
-        )
-    )
-    with open(file_out, "w", encoding="utf-8") as file:
-        file.write(results)
     logging.info(f"Keeping {record_num} records")
+    with open(file_out, "w", encoding="utf-8") as file:
+        pass
+
+    with open(file_out, "a", encoding="utf-8") as file:
+        for line in process_large_sql_file(
+            file_in, kept_pattern=r"^(?!insert).*", filter_callback=keep_records
+        ):
+            file.write(line)
+
     logging.info("SQL command trimmed")
 
 

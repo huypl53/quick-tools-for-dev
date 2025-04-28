@@ -1,0 +1,13 @@
+services:
+  mysql:
+    image: container-registry.oracle.com/mysql/community-server:latest
+    container_name: gsv-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=yolo2chill
+    volumes:
+      # - mysql-data:/var/lib/mysql
+      - ./mysql-init.sql:/docker-entrypoint-initdb.d/mysql-init.sql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+    restart: unless-stopped
