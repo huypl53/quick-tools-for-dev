@@ -1,0 +1,5 @@
+# PostgreSQL data directory
+postgres_data/
+
+# pgAdmin data directory
+pgadmin_data/
