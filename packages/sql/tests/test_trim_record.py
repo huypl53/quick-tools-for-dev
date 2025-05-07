@@ -7,7 +7,9 @@ def test_process_large_sql_file(tmp_path: Path):
     sql_file = tmp_path / "test.sql"
     sql_file.write_text(
         "CREATE TABLE example (id INT, name TEXT);\n"
-        "INSERT INTO example VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Extra'), (4, 'yolo'), (5, 'pacha');\n"
+        "INSERT INTO example VALUES (1, 'Alice'), (2, 'Bob is not good (not with everybody)'), (3, 'Extra (more than usual)'), (4, 'yolo'), (5, 'foo'), (6, 'bar');\n"
+        "INSERT INTO example VALUES (1, 'Alice'), (2, 'Bob is not good (not with everybody)'), (3, 'Extra more than usual)'), (4, 'yolo'), (5, 'foo'), (6, 'bar');\n"
+        "INSERT INTO example VALUES (1, 'Alice'), (2, 'Bob is not good (not with everybody)'), (3, 'Extra (more than usual'), (4, 'yolo'), (5, 'foo'), (6, 'bar');\n"
         "SELECT * FROM example;\n"
     )
 
@@ -24,6 +26,8 @@ def test_process_large_sql_file(tmp_path: Path):
     # Assert the results
     assert results == (
         "CREATE TABLE example (id INT, name TEXT);\n"
-        "INSERT INTO example VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Extra');\n"
+        "INSERT INTO example VALUES (1, 'Alice'), (2, 'Bob is not good (not with everybody)'), (3, 'Extra (more than usual)');\n"
+        "INSERT INTO example VALUES (1, 'Alice'), (2, 'Bob is not good (not with everybody)'), (3, 'Extra more than usual)');\n"
+        "INSERT INTO example VALUES (1, 'Alice'), (2, 'Bob is not good (not with everybody)'), (3, 'Extra (more than usual');\n"
         "SELECT * FROM example;\n"
     )

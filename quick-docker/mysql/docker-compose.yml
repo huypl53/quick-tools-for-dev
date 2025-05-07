@@ -10,4 +10,4 @@ services:
       # - mysql-data:/var/lib/mysql
       - ./mysql-init.sql:/docker-entrypoint-initdb.d/mysql-init.sql
       - ./my.cnf:/etc/mysql/conf.d/my.cnf
-    restart: unless-stopped
+    # restart: unless-stopped

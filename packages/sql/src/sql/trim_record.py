@@ -16,28 +16,68 @@ def process_large_sql_file(
     Yields:
         str: Processed lines that match the kept pattern or pass the filter callback.
     """
-
     re_kept = re.compile(kept_pattern, re.IGNORECASE)
     with open(file_path, "r", encoding="utf-8") as file:
         for line in file:
-            # Skip lines that don't contain 'insert'
             if re_kept.match(line.lower()):
                 yield line
-                continue
-
-            if filter_callback:
+            else:
                 filtered_line = filter_callback(line)
-                if not filtered_line:
-                    continue
-                yield filtered_line
+                if filtered_line:
+                    yield filtered_line
 
 
-# Define a filter callback to match content inside parentheses
+def find_closing_paren(s: str, start: int) -> int:
+    """Find the position of the matching closing parenthesis."""
+    count = 1
+    i = start
+    while count > 0 and i < len(s):
+        if s[i] == "(":
+            count += 1
+        elif s[i] == ")":
+            count -= 1
+        i += 1
+    return i - 1 if count == 0 else -1
+
+
 def keep_records(line, up_to=3):
-    import re
+    """
+    Keep only up_to records from a SQL INSERT statement.
+    Handles basic cases of missing parentheses.
+    """
+    if "VALUES" not in line:
+        return line
 
-    prefix = " ".join(re.findall(r"^[^(]*", line))
-    suffix = " ".join(re.findall(r"(?<=\))[^)]*$", line))
+    # Split the line at VALUES
+    before_values, after_values = line.split("VALUES", 1)
+    after_values = after_values.strip()
 
-    matches = re.findall(r"\(.*?\)", line)
-    return f"{prefix}{", ".join(matches[:up_to]) if matches else ""}{suffix}"
+    # Find all value groups
+    values = []
+    current = ""
+    paren_count = 0
+
+    for char in after_values:
+        if char == "(":
+            paren_count += 1
+            current += char
+        elif char == ")":
+            paren_count -= 1
+            current += char
+            if paren_count == 0:
+                values.append(current.strip())
+                current = ""
+                if len(values) >= up_to:
+                    break
+        else:
+            current += char
+
+    # Handle any remaining value without closing parenthesis
+    if current.strip():
+        values.append(current.strip())
+
+    # Take only up_to values
+    values = values[:up_to]
+
+    # Reconstruct the line
+    return f"{before_values}VALUES {', '.join(values)};\n"
