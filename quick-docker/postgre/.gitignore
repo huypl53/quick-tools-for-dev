@@ -3,3 +3,5 @@ postgres_data/
 
 # pgAdmin data directory
 pgadmin_data/
+postgres_sql_qa_data/
+pgadmin_sql_qa_data/
